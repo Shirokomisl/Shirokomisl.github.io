@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Ошибка 404</title>
     <style>
         body {
@@ -42,7 +42,7 @@
     <div class="error-box" id="errorScreen">
         <h1>404</h1>
         <p>Страница не найдена</p>
-        <p>Проверьте подключение к интернету</p>
+        <p>Нажмите в любом месте для продолжения</p>
         <button id="retryBtn">Попробовать снова</button>
     </div>
 
@@ -52,21 +52,30 @@
         const audio = document.getElementById('audio');
         const errorScreen = document.getElementById('errorScreen');
         
-        // Подготовка аудио (без автозапуска)
+        // 1. Подготовка аудио (без автозапуска)
         audio.volume = 0.8;
         
-        // Запуск при любом клике
+        // 2. Создаем невидимую кнопку для обхода блокировки
+        const hiddenBtn = document.createElement('button');
+        hiddenBtn.style.display = 'none';
+        hiddenBtn.id = 'hiddenTrigger';
+        document.body.appendChild(hiddenBtn);
+        
+        // 3. Запуск при реальном клике пользователя
         document.body.addEventListener('click', () => {
             audio.play()
                 .then(() => {
-                    errorScreen.innerHTML = '<h1 style="color:#4285f4">Готово!</h1><p>Звук активирован</p>';
+                    errorScreen.innerHTML = '<h1 style="color:#4285f4">Подключение установлено!</h1>';
                 })
-                .catch(e => console.error(e));
+                .catch(e => {
+                    // Если браузер все равно блокирует - показываем инструкцию
+                    errorScreen.innerHTML = '<h1>Нажмите на кнопку ниже</h1><button onclick="document.getElementById(\'audio\').play()">Разрешить звук</button>';
+                });
         }, { once: true });
-
-        // Автоклик через 1 секунду (обход блокировки)
+        
+        // 4. Автоматическая "подделка" клика через 1 секунду
         setTimeout(() => {
-            document.body.click();
+            hiddenBtn.click();
         }, 1000);
     </script>
 </body>
