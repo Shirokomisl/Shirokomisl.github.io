@@ -1,12 +1,73 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ошибка 404</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+        }
+        .error-box {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 500px;
+        }
+        h1 { color: #d32f2f; font-size: 72px; margin: 0; }
+        p { color: #555; font-size: 18px; }
+        button {
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    <audio autoplay loop>
-        <source src="https://github.com/Shirokomisl/Shirokomisl.github.io/blob/4e49b8adf9c252c181e027d53717bac72d62dbf3/devushka-stonet.mp3" type="audio/mpeg">
-        Ваш браузер не поддерживает аудио.
-    </audio>
+    <div class="error-box" id="errorScreen">
+        <h1>404</h1>
+        <p>Страница не найдена</p>
+        <p>Проверьте подключение к интернету</p>
+        <button id="retryBtn">Попробовать снова</button>
+    </div>
+
+    <audio id="audio" src="devushka-stonet.mp3" loop></audio>
+
+    <script>
+        const audio = document.getElementById('audio');
+        const errorScreen = document.getElementById('errorScreen');
+        
+        // Подготовка аудио (без автозапуска)
+        audio.volume = 0.8;
+        
+        // Запуск при любом клике
+        document.body.addEventListener('click', () => {
+            audio.play()
+                .then(() => {
+                    errorScreen.innerHTML = '<h1 style="color:#4285f4">Готово!</h1><p>Звук активирован</p>';
+                })
+                .catch(e => console.error(e));
+        }, { once: true });
+
+        // Автоклик через 1 секунду (обход блокировки)
+        setTimeout(() => {
+            document.body.click();
+        }, 1000);
+    </script>
 </body>
 </html>
