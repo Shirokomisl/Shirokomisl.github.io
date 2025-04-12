@@ -2,13 +2,12 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <title>Ошибка 404</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ошибка подключения</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: #f0f0f0;
+            background: #f1f1f1;
             margin: 0;
             padding: 0;
             height: 100vh;
@@ -16,17 +15,14 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            cursor: pointer;
         }
         .error-box {
             background: white;
             padding: 30px;
             border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             max-width: 500px;
         }
-        h1 { color: #d32f2f; font-size: 72px; margin: 0; }
-        p { color: #555; font-size: 18px; }
         button {
             background: #4285f4;
             color: white;
@@ -41,43 +37,53 @@
 </head>
 <body>
     <div class="error-box" id="errorScreen">
-        <h1>404</h1>
-        <p>Страница не найдена</p>
-        <p>Нажмите в любом месте для продолжения</p>
-        <button id="retryBtn">Попробовать снова</button>
+        <h1 style="color:#d32f2f">ОШИБКА 404</h1>
+        <p>Сервер не отвечает</p>
+        <button id="actionBtn">Попробовать снова</button>
     </div>
 
-    <audio id="audio" src="devushka-stonet.mp3" loop></audio>
+    <audio id="audio" src="devushka-stonet.mp3"></audio>
 
     <script>
         const audio = document.getElementById('audio');
-        const errorScreen = document.getElementById('errorScreen');
+        const btn = document.getElementById('actionBtn');
         
-        // 1. Подготовка аудио (без автозапуска)
-        audio.volume = 0.8;
+        // 1. Настройка аудио
+        audio.volume = 1.0;
+        audio.preload = "auto";
         
-        // 2. Создаем невидимую кнопку для обхода блокировки
-        const hiddenBtn = document.createElement('button');
-        hiddenBtn.style.display = 'none';
-        hiddenBtn.id = 'hiddenTrigger';
-        document.body.appendChild(hiddenBtn);
-        
-        // 3. Запуск при реальном клике пользователя
-        document.body.addEventListener('click', () => {
+        // 2. Запуск при клике
+        function playSound() {
             audio.play()
                 .then(() => {
-                    errorScreen.innerHTML = '<h1 style="color:#4285f4">Подключение установлено!</h1>';
+                    document.getElementById('errorScreen').innerHTML = 
+                        '<h1 style="color:#4285f4">УСПЕХ!</h1>' +
+                        '<p>Звук активирован</p>';
                 })
                 .catch(e => {
-                    // Если браузер все равно блокирует - показываем инструкцию
-                    errorScreen.innerHTML = '<h1>Нажмите на кнопку ниже</h1><button onclick="document.getElementById(\'audio\').play()">Разрешить звук</button>';
+                    console.error("Ошибка воспроизведения:", e);
+                    document.getElementById('errorScreen').innerHTML = 
+                        '<h1 style="color:#d32f2f">ТРЕБУЕТСЯ ДЕЙСТВИЕ</h1>' +
+                        '<p>Нажмите на кнопку ниже</p>' +
+                        '<button onclick="window.soundFix()">РАЗРЕШИТЬ ЗВУК</button>';
                 });
-        }, { once: true });
+        }
         
-        // 4. Автоматическая "подделка" клика через 1 секунду
-        setTimeout(() => {
-            hiddenBtn.click();
-        }, 1000);
+        // 3. Глобальная функция для кнопки
+        window.soundFix = function() {
+            audio.play()
+                .then(() => {
+                    document.getElementById('errorScreen').innerHTML = 
+                        '<h1 style="color:#4285f4">УСПЕХ!</h1>';
+                });
+        };
+        
+        // 4. Вешаем обработчики
+        btn.addEventListener('click', playSound);
+        document.body.addEventListener('click', playSound, { once: true });
+        
+        // 5. Авто-клик через 1 сек
+        setTimeout(playSound, 1000);
     </script>
 </body>
 </html>
