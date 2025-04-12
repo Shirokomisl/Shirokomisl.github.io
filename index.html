@@ -6,8 +6,8 @@
     <title>Ошибка подключения</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background: #f1f1f1;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f5f5f5;
             margin: 0;
             padding: 0;
             height: 100vh;
@@ -15,74 +15,96 @@
             justify-content: center;
             align-items: center;
             text-align: center;
+            color: #333;
         }
-        .error-box {
+        .chrome-error {
             background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            max-width: 500px;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 480px;
+            border-top: 4px solid #ea4335;
         }
-        button {
+        .error-icon {
+            font-size: 48px;
+            color: #ea4335;
+            margin-bottom: 16px;
+        }
+        .error-title {
+            font-size: 22px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        .error-details {
+            color: #666;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+        .error-code {
+            font-family: monospace;
+            background: #f1f1f1;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        .action-btn {
             background: #4285f4;
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 5px;
-            font-size: 16px;
-            margin-top: 20px;
+            padding: 10px 24px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
             cursor: pointer;
+            transition: background 0.2s;
+        }
+        .action-btn:hover {
+            background: #3367d6;
+        }
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="error-box" id="errorScreen">
-        <h1 style="color:#d32f2f">ОШИБКА 404</h1>
-        <p>Сервер не отвечает</p>
-        <button id="actionBtn">Попробовать снова</button>
+    <div class="chrome-error" id="errorScreen">
+        <div class="error-icon">⚠️</div>
+        <h1 class="error-title">Не удается получить доступ к сайту</h1>
+        <p class="error-details">
+            Возникла проблема с подключением к <span class="error-code">brawlstars.ru</span>.<br>
+            Проверьте настройки сети или брандмауэра.
+        </p>
+        <button class="action-btn" id="retryBtn">Перезагрузить</button>
     </div>
 
-    <audio id="audio" src="devushka-stonet.mp3"></audio>
+    <audio id="audio" src="devushka-stonet.mp3" loop></audio>
 
     <script>
         const audio = document.getElementById('audio');
-        const btn = document.getElementById('actionBtn');
+        const retryBtn = document.getElementById('retryBtn');
         
-        // 1. Настройка аудио
+        // Настройка аудио
         audio.volume = 1.0;
         audio.preload = "auto";
         
-        // 2. Запуск при клике
+        // Функция воспроизведения
         function playSound() {
             audio.play()
                 .then(() => {
-                    document.getElementById('errorScreen').innerHTML = 
-                        '<h1 style="color:#4285f4">УСПЕХ!</h1>' +
-                        '<p>Звук активирован</p>';
+                    // Меняем текст кнопки при успехе
+                    retryBtn.textContent = "Перезагрузка...";
+                    retryBtn.style.background = "#34a853";
                 })
                 .catch(e => {
-                    console.error("Ошибка воспроизведения:", e);
-                    document.getElementById('errorScreen').innerHTML = 
-                        '<h1 style="color:#d32f2f">ТРЕБУЕТСЯ ДЕЙСТВИЕ</h1>' +
-                        '<p>Нажмите на кнопку ниже</p>' +
-                        '<button onclick="window.soundFix()">РАЗРЕШИТЬ ЗВУК</button>';
+                    console.error("Ошибка загрузки:", e);
+                    retryBtn.textContent = "Попробуйте снова позже";
                 });
         }
         
-        // 3. Глобальная функция для кнопки
-        window.soundFix = function() {
-            audio.play()
-                .then(() => {
-                    document.getElementById('errorScreen').innerHTML = 
-                        '<h1 style="color:#4285f4">УСПЕХ!</h1>';
-                });
-        };
-        
-        // 4. Вешаем обработчики
-        btn.addEventListener('click', playSound);
+        // Обработчики событий
+        retryBtn.addEventListener('click', playSound);
         document.body.addEventListener('click', playSound, { once: true });
         
-        // 5. Авто-клик через 1 сек
+        // Автоматическая попытка через 1 сек
         setTimeout(playSound, 1000);
     </script>
 </body>
